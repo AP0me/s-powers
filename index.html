@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Superpower Assigner</title>
-    <!-- Use Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --card-text-size: 1.25rem; /* Corresponds to text-xl */
+        }
         body {
             font-family: 'Inter', sans-serif;
             background: #111827;
@@ -49,6 +51,9 @@
             color: #d1d5db;
             transform: rotateY(180deg);
         }
+        .card-back h2 {
+            font-size: var(--card-text-size); /* Use CSS variable for dynamic sizing */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen flex items-center justify-center p-4">
@@ -58,35 +63,51 @@
             Choose how many superpowers you want and click "Renew" to see your destiny!
         </p>
 
-        <!-- Control Panel -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <div class="flex w-full sm:w-auto gap-4">
-                <label for="power-count" class="text-gray-300 font-medium block mb-2 p-3">Number of Powers:</label>
+            <div class="flex w-full sm:w-auto gap-4 items-center">
+                <label for="power-count" class="text-gray-300 font-medium">Number of Powers:</label>
                 <input type="number" id="power-count" value="3" min="1" max="10"
-                    class="w-full sm:w-24 bg-gray-700 text-gray-200 p-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200">
+                    class="w-24 bg-gray-700 text-gray-200 p-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200">
             </div>
             <button id="assign-button"
                 class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-transform duration-200 transform hover:scale-105">
                 Renew
             </button>
+            <button id="settings-button"
+                class="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
         </div>
 
-        <!-- Superpower Cards Container -->
         <div id="superpowers-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Cards will be injected here by JavaScript -->
-        </div>
+            </div>
 
-        <!-- Message Box -->
-        <div id="message-box" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden">
+        <div id="message-box" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
             <div class="bg-gray-800 p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
                 <p id="message-text" class="text-gray-200 text-lg mb-4"></p>
                 <button id="close-message" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">OK</button>
             </div>
         </div>
+
+        <div id="settings-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 p-8 rounded-2xl shadow-xl max-w-md w-full space-y-6">
+                <h2 class="text-2xl font-bold text-center text-indigo-400">Settings</h2>
+                <div class="space-y-4">
+                    <label for="text-size-slider" class="block text-gray-300 font-medium">Card Text Size</label>
+                    <input type="range" id="text-size-slider" min="0.75" max="2" value="1.25" step="0.05"
+                        class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <button id="close-settings" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Done</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Array of superpowers from the provided text file
+        // Array of superpowers (you would populate this from a file or API)
         const superpowerList = [
 "Cell Manipulation", 
 "Radiation Manipulation", 
@@ -1025,6 +1046,7 @@
 "Team Synergy", 
 "Elemental Constructs", 
 "Non-Biological Duplication", 
+"Omniarch", 
 "Hallucination Solidification", 
 "Orthoptera Physiology", 
 "Controlled Adrenaline Rush", 
@@ -28575,15 +28597,22 @@
 "Bagpipes Mastery", 
 "Miniature World Creation", 
 "Armouring Mastery", 
-
 ];
         
         const assignButton = document.getElementById('assign-button');
         const powerCountInput = document.getElementById('power-count');
         const superpowersContainer = document.getElementById('superpowers-container');
+
+        // Message Box elements
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const closeMessageButton = document.getElementById('close-message');
+
+        // Settings Modal elements
+        const settingsButton = document.getElementById('settings-button');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsButton = document.getElementById('close-settings');
+        const textSizeSlider = document.getElementById('text-size-slider');
 
         // Show a message box
         function showMessage(message) {
@@ -28634,8 +28663,8 @@
                             <h2 class="text-xl font-bold text-gray-300">Superpower #${index + 1}</h2>
                         </div>
                         <div class="card-back flex items-center justify-center p-4">
-                            <a href="https://powerlisting.fandom.com/wiki/${power}">
-                                <h2 class="text-xl font-bold text-white text-center">${power}</h2>
+                            <a href="https://powerlisting.fandom.com/wiki/${power.replace(/ /g, '_')}" target="_blank" rel="noopener noreferrer">
+                                <h2 class="font-bold text-white text-center">${power}</h2>
                             </a>
                         </div>
                     </div>
@@ -28648,9 +28677,21 @@
                 superpowersContainer.appendChild(card);
             });
         }
+        
+        // --- Event Listeners ---
 
+        // Controls
         assignButton.addEventListener('click', generatePowers);
         closeMessageButton.addEventListener('click', hideMessage);
+
+        // Settings Modal
+        settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+        // Text Size Slider
+        textSizeSlider.addEventListener('input', (event) => {
+            document.documentElement.style.setProperty('--card-text-size', `${event.target.value}rem`);
+        });
 
         // Initial generation of powers when the page loads
         document.addEventListener('DOMContentLoaded', generatePowers);
